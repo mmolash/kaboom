@@ -6,6 +6,7 @@ var DIR_DOWN  = 3;
 enchant();
 window.onload = function() {
     var game = new Core(320, 320);
+    var g = game;
     game.fps = 16;
     game.preload('Assets/prisoner.png', 'Assets/map.png');
     game.onload = function() {
@@ -31,62 +32,32 @@ window.onload = function() {
         thing.image = game.assets['Assets/prisoner.png'];
         thing.x = 160-13;
         thing.y = 75-25;
-        thing.frame = 1;
+        thing.frame = 0;
 
-        thing.toX = thing.x;
-        thing.toY = thing.y;
-        thing.dir = DIR_DOWN;
-        thing.anim = [
-            9, 10, 11, 10, //Left
-            18, 19, 20, 19, //Right
-            27, 28, 29, 28, //Up
-            0,  1,  2,  1]; //Down
+        thing.move = function(direction) {
+            switch(direction) {
+              case "right":
+                thing.x += 5;
+                thing.scaleX = 1;
+                break;
+              case "left":
+                thing.x -= 5;
+                thing.scaleX = -1;
+                break;
+              default:
+                console.log("not a valid direction");
+                break;
+            }
+        }
+
         game.rootScene.addChild(thing);
         thing.addEventListener(Event.ENTER_FRAME, function() {
-            if (thing.y > thing.toY) {
-                thing.dir = DIR_UP;
-                if (Math.abs(thing.y - thing.toY) < 6) {
-                    thing.y = thing.toY;
-                } else {
-                    thing.y -= 6;
-                }
-            } else if (thing.y < thing.toY) {
-                thing.dir = DIR_DOWN;
-                if (Math.abs(thing.y - thing.toY) < 6) {
-                    thing.y = thing.toY;
-                } else {
-                    thing.y += 6;
-                }
+            if (g.input.right) {
+                this.move("right");
             }
-            if (thing.x > thing.toX) {
-                thing.dir = DIR_LEFT;
-                if (Math.abs(thing.x - thing.toX) < 6) {
-                    thing.x = thing.toX;
-                } else {
-                    thing.x -= 6;
-                }
-            } else if (thing.x < thing.toX) {
-                thing.dir = DIR_RIGHT;
-                if (Math.abs(thing.x - thing.toX) < 6) {
-                    thing.x = thing.toX;
-                } else {
-                    thing.x += 6;
-                }
+            if (g.input.left) {
+                this.move("left");
             }
-
-            if (thing.x == thing.toX && thing.y == thing.toY)
-                thing.age = 1;
-            thing.frame = thing.anim[thing.dir *4 + (thing.age % 4)];
-        });
-
-        bg.addEventListener(Event.TOUCH_START, function(e) {
-            thing.toX = e.x - 16;
-            thing.toY = e.y - 16;
-        });
-
-        bg.addEventListener(Event.TOUCH_MOVE, function(e) {
-            thing.toX = e.x - 16;
-            thing.toY = e.y - 16;
         });
     };
     game.start();
