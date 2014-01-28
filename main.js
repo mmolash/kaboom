@@ -1,14 +1,9 @@
-var DIR_LEFT  = 0;
-var DIR_RIGHT = 1;
-var DIR_UP    = 2;
-var DIR_DOWN  = 3;
-
 enchant();
 window.onload = function() {
     var game = new Core(320, 320);
     var g = game;
-    game.fps = 16;
-    game.preload('Assets/prisoner.png', 'Assets/map.png');
+    game.fps = 30;
+    game.preload('Assets/prisoner.png', 'Assets/map.png', 'Assets/basket.png');
     game.onload = function() {
         var bg = new Sprite(320, 320);
         var maptip = game.assets['Assets/map.png'];
@@ -28,21 +23,23 @@ window.onload = function() {
         bg.image = image;
         game.rootScene.addChild(bg);
 
-        var thing = new Sprite(25, 50);
-        thing.image = game.assets['Assets/prisoner.png'];
-        thing.x = 160-13;
-        thing.y = 75-25;
+        var thing = new Sprite(62, 89);
+        thing.image = game.assets['Assets/basket.png'];
+        thing.x = 160-31;
+        thing.y = 260-45;
         thing.frame = 0;
 
         thing.move = function(direction) {
             switch(direction) {
               case "right":
-                thing.x += 5;
-                thing.scaleX = 1;
+                if (this.x < 320-62) {
+                    thing.x += 5;
+                }
                 break;
               case "left":
-                thing.x -= 5;
-                thing.scaleX = -1;
+                if (this.x > 0) {
+                    thing.x -= 5;
+                }
                 break;
               default:
                 console.log("not a valid direction");
@@ -58,6 +55,10 @@ window.onload = function() {
             if (g.input.left) {
                 this.move("left");
             }
+        });
+
+        thing.addEventListener(Event.TOUCH_MOVE, function(event) {
+            this.x = event.x;
         });
     };
     game.start();
