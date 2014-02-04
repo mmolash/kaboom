@@ -1,3 +1,6 @@
+var DIR_LEFT = 0;
+var DIR_RIGHT = 1;
+
 enchant();
 window.onload = function() {
     var game = new Core(320, 320);
@@ -29,6 +32,8 @@ window.onload = function() {
         bg.image = image;
         game.rootScene.addChild(bg);
 
+        var level = 1;
+
         var basket = new Sprite(62, 89);
         basket.image = game.assets['Assets/basket.png'];
         basket.x = 160-31;
@@ -36,10 +41,13 @@ window.onload = function() {
         basket.frame = 0;
 
         var prisoner = new Sprite(32, 66);
+        prisoner.direction = 0;
+        prisoner.duration = 0;
         prisoner.image = game.assets['Assets/prisoner.png'];
         prisoner.x = 160-16;
         prisoner.y = 51-33;
         prisoner.frame = 0;
+        prisoner.bomb = new Array();
 
         game.rootScene.addChild(basket);
         game.rootScene.addChild(prisoner);
@@ -55,8 +63,34 @@ window.onload = function() {
           }
         };
 
-        basket.addEventListener(Event.TOUCH_MOVE, function(event) {
-            this.x = event.x;
+        prisoner.dropbomb = function() {
+          if (this.age % 20 = 0) {
+
+          }
+        }
+
+        prisoner.move = function() {
+          if (this.duration <= 0) {
+            this.direction = Math.floor(Math.random()*2);
+            this.duration = Math.floor(Math.random()*20+5);
+          }
+
+          if (this.x <= 0) {
+            this.direction = DIR_RIGHT;
+          } else if (this.x >= 320 - 32) {
+            this.direction = DIR_LEFT;
+          }
+
+          if (this.direction === DIR_LEFT) {
+            this.x -= level * 3;
+          } else if (this.direction === DIR_RIGHT) {
+            this.x += level * 3;
+          }
+        }
+
+        prisoner.addEventListener(Event.ENTER_FRAME, function() {
+          this.move();
+          this.duration -= 1;
         });
 
         document.addEventListener("mousemove", function(event){
