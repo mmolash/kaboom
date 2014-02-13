@@ -6,10 +6,10 @@ window.onload = function() {
     var game = new Core(320, 320);
     var g = game;
     game.fps = 30;
-    game.preload('Assets/prisoner.png', 'Assets/map.png', 'Assets/basket.png');
+    game.preload('assets/prisoner.png', 'assets/map.png', 'assets/basket.png', 'assets/bomb.png');
     game.onload = function() {
         var bg = new Sprite(320, 320);
-        var maptip = game.assets['Assets/map.png'];
+        var maptip = game.assets['assets/map.png'];
         var image = new Surface(320, 320);
 
         for (var j = 0; j < 80; j += 16) {
@@ -35,7 +35,7 @@ window.onload = function() {
         var level = 1;
 
         var basket = new Sprite(62, 89);
-        basket.image = game.assets['Assets/basket.png'];
+        basket.image = game.assets['assets/basket.png'];
         basket.x = 160-31;
         basket.y = 260-45;
         basket.frame = 0;
@@ -43,7 +43,7 @@ window.onload = function() {
         var prisoner = new Sprite(32, 66);
         prisoner.direction = 0;
         prisoner.duration = 0;
-        prisoner.image = game.assets['Assets/prisoner.png'];
+        prisoner.image = game.assets['assets/prisoner.png'];
         prisoner.x = 160-16;
         prisoner.y = 51-33;
         prisoner.frame = 0;
@@ -62,12 +62,6 @@ window.onload = function() {
               this.x = 0
           }
         };
-
-        prisoner.dropbomb = function() {
-          if (this.age % 20 = 0) {
-
-          }
-        }
 
         prisoner.move = function() {
           if (this.duration <= 0) {
@@ -88,9 +82,16 @@ window.onload = function() {
           }
         }
 
+        prisoner.dropBomb = function() {
+          this.bomb.push(createBomb(this.x, this.y, g))
+        }
+
         prisoner.addEventListener(Event.ENTER_FRAME, function() {
           this.move();
           this.duration -= 1;
+          if (this.age % 20 === 0) {
+            this.dropBomb();
+          }
         });
 
         document.addEventListener("mousemove", function(event){
