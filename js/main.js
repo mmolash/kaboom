@@ -35,6 +35,12 @@ window.onload = function() {
         var level = 1;
         var score = 0;
 
+        var scoreboard = new Label("0");
+        scoreboard.font  = "50px monospace";
+        scoreboard.color = "red";
+        scoreboard.x     = 0;
+        scoreboard.y     = 0;
+
         var basket = new Sprite(62, 89);
         basket.image = game.assets['assets/basket.png'];
         basket.x = 160-31;
@@ -49,9 +55,11 @@ window.onload = function() {
         prisoner.y = 51-33;
         prisoner.frame = 0;
         prisoner.bomb = new Array();
+        prisoner.num_bombs = 0;
 
         game.rootScene.addChild(basket);
         game.rootScene.addChild(prisoner);
+        game.rootScene.addChild(scoreboard);
 
         basket.move = function(x) {
           targetX = x/2 - 31;
@@ -89,21 +97,32 @@ window.onload = function() {
 
         prisoner.changeLevel = function() {
           level += 1;
-          this.bomb = [];
+          this.num_bombs = 0;
         }
 
         prisoner.addEventListener(Event.ENTER_FRAME, function() {
           this.move();
           this.duration -= 1;
-          if (this.age % 33 === 0 && this.bomb.length < level * 10) {
+          if (this.age % 20 === 0 && this.num_bombs < level * 10) {
             this.dropBomb();
-          } else if (this.bomb.length >= level * 10) {
+            this.num_bombs += 1;
+          } else if (this.num_bombs >= level * 10) {
             this.changeLevel();
           }
         });
 
         basket.addEventListener(Event.ENTER_FRAME, function() {
-          console.log(prisoner.bomb[0]);
+          for (var i = 0; i < prisoner.bomb.length; i++) {
+            if (prisoner.bomb[i].sprite.checkCollision()) {
+              g.rootScene.removeChild(prisoner.bomb[i].sprite);
+              score += level;
+              prisoner.bomb.splice(i, 1);
+            }
+          }
+        });
+
+        scoreboard.addEventListener(Event.ENTER_FRAME, function() {
+          this.text = score.toString();
         });
 
         document.addEventListener("mousemove", function(event){
