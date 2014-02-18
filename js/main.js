@@ -33,6 +33,7 @@ window.onload = function() {
         game.rootScene.addChild(bg);
 
         var level = 1;
+        var score = 0;
 
         var basket = new Sprite(62, 89);
         basket.image = game.assets['assets/basket.png'];
@@ -76,22 +77,33 @@ window.onload = function() {
           }
 
           if (this.direction === DIR_LEFT) {
-            this.x -= level * 3;
+            this.x -= Math.log(level+1) * 7;
           } else if (this.direction === DIR_RIGHT) {
-            this.x += level * 3;
+            this.x += Math.log(level+1) * 7;
           }
         }
 
         prisoner.dropBomb = function() {
-          this.bomb.push(createBomb(this.x, this.y, g))
+          this.bomb.push(createBomb(this.x, (this.y + 66 - 16), g, level, basket))
+        }
+
+        prisoner.changeLevel = function() {
+          level += 1;
+          this.bomb = [];
         }
 
         prisoner.addEventListener(Event.ENTER_FRAME, function() {
           this.move();
           this.duration -= 1;
-          if (this.age % 20 === 0) {
+          if (this.age % 33 === 0 && this.bomb.length < level * 10) {
             this.dropBomb();
+          } else if (this.bomb.length >= level * 10) {
+            this.changeLevel();
           }
+        });
+
+        basket.addEventListener(Event.ENTER_FRAME, function() {
+          console.log(prisoner.bomb[0]);
         });
 
         document.addEventListener("mousemove", function(event){
