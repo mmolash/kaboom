@@ -18,8 +18,11 @@ var createBomb = function(x, y, game, level, basket) {
   }
 
   that.sprite.checkExplosion = function () {
-    if (this.y + 33 >= 320) {
+    if (this.y + 33 >= WINDOW_HEIGHT) {
       game.rootScene.removeChild(this);
+      return true;
+    } else {
+      return false;
     }
   }
 
