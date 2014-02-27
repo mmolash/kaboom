@@ -2,7 +2,7 @@ var DIR_LEFT = 0;
 var DIR_RIGHT = 1;
 var WINDOW_WIDTH = 640;
 var WINDOW_HEIGHT = 400;
-var gameStatus = 1;
+var gameStatus = -1;
 
 enchant();
 window.onload = function() {
@@ -35,14 +35,14 @@ window.onload = function() {
         bg.image = image;
         game.rootScene.addChild(bg);
 
-        var level = 1;
+        var level = 0;
         var score = 0;
 
         var scoreboard = new Label("0");
-        scoreboard.font  = "50px monospace";
-        scoreboard.color = "red";
-        scoreboard.x     = 0;
-        scoreboard.y     = 0;
+        scoreboard.font  = "30px Press-Start-2P";
+        scoreboard.color = "yellow";
+        scoreboard.x     = 5;
+        scoreboard.y     = 5;
 
         var basket = new Sprite(62, 89);
         basket.image = game.assets['assets/basket.png'];
@@ -60,9 +60,22 @@ window.onload = function() {
         prisoner.bomb = new Array();
         prisoner.num_bombs = 0;
 
+        var levelLabel = new Label("New Level");
+        levelLabel.font = "40px Press-Start-2P";
+        levelLabel.color = "yellow";
+        levelLabel.x = 140;
+        levelLabel.y = 200-20;
+
         game.rootScene.addChild(basket);
         game.rootScene.addChild(prisoner);
         game.rootScene.addChild(scoreboard);
+
+        levelLabel.addEventListener(Event.TOUCH_START, function() {
+          if (gameStatus === 1) {
+            game.rootScene.removeChild(levelLabel);
+            gameStatus = 2;
+          }
+        });
 
         basket.move = function(x) {
           targetX = x - 31;
@@ -99,34 +112,48 @@ window.onload = function() {
         }
 
         prisoner.changeLevel = function() {
-          level += 1;
           this.num_bombs = 0;
+          gameStatus = 1;
+          level += 1;
+          game.rootScene.addChild(levelLabel);
         }
 
         prisoner.addEventListener(Event.ENTER_FRAME, function() {
-          this.move();
+          if (gameStatus === 2) {
+            this.move();
+          }
+
           this.duration -= 1;
-          if (this.age % Math.floor((16/Math.log(level + 1))) === 0 && this.num_bombs < level * 10) {
+
+          if ((this.age % Math.floor((16/Math.log(level + 1))) === 0 && this.num_bombs < level * 10) && gameStatus === 2) {
             this.dropBomb();
             this.num_bombs += 1;
-          } else if (this.num_bombs >= level * 10) {
+          }
+
+          if (this.num_bombs >= level * 10 && this.bomb.length === 0) {
+            gameStatus = -1;
+          }
+
+          if (gameStatus === -1) {
             this.changeLevel();
           }
         });
 
         basket.addEventListener(Event.ENTER_FRAME, function() {
           for (var i = 0; i < prisoner.bomb.length; i++) {
-            if (prisoner.bomb[i].sprite.checkCollision()) {
+            if (prisoner.bomb[i] && prisoner.bomb[i].sprite.checkExplosion()) {
+              gameStatus = 0;
+              if (level > 1 && gameStatus === 0) {
+                level -= 1;
+                gameStatus = 1;
+                prisoner.bomb.splice(i, 1);
+              }
+            }
+
+            if (prisoner.bomb[i] && prisoner.bomb[i].sprite.checkCollision()) {
               g.rootScene.removeChild(prisoner.bomb[i].sprite);
               score += level;
               prisoner.bomb.splice(i, 1);
-            }
-
-            if (prisoner.bomb[i].sprite.checkExplosion()) {
-              gameStatus = 0;
-              if (level > 1) {
-                level -= 1;
-              }
             }
           }
         });
