@@ -35,16 +35,17 @@ window.onload = function() {
         bg.image = image;
         game.rootScene.addChild(bg);
 
+        var lives = 3;
         var level = 0;
         var score = 0;
 
         var scoreboard = new Label("0");
-        scoreboard.font  = "30px Press-Start-2P";
+        scoreboard.font = "30px Press-Start-2P";
         scoreboard.color = "yellow";
-        scoreboard.x     = 5;
-        scoreboard.y     = 5;
+        scoreboard.x = 5;
+        scoreboard.y = 5;
 
-        var basket = new Sprite(62, 89);
+        var basket = new Sprite(63, 89);
         basket.image = game.assets['assets/basket.png'];
         basket.x = WINDOW_WIDTH/2-31;
         basket.y = WINDOW_HEIGHT-89-20;
@@ -115,6 +116,7 @@ window.onload = function() {
           this.num_bombs = 0;
           gameStatus = 1;
           level += 1;
+          levelLabel.text = "New Level"
           game.rootScene.addChild(levelLabel);
         }
 
@@ -143,11 +145,10 @@ window.onload = function() {
           for (var i = 0; i < prisoner.bomb.length; i++) {
             if (prisoner.bomb[i] && prisoner.bomb[i].sprite.checkExplosion()) {
               gameStatus = 0;
-              if (level > 1 && gameStatus === 0) {
-                level -= 1;
-                gameStatus = 1;
-                prisoner.bomb.splice(i, 1);
-              }
+            }
+
+            if (gameStatus === 0) {
+              prisoner.bomb.splice(i, 1);
             }
 
             if (prisoner.bomb[i] && prisoner.bomb[i].sprite.checkCollision()) {
@@ -155,6 +156,31 @@ window.onload = function() {
               score += level;
               prisoner.bomb.splice(i, 1);
             }
+          }
+
+          console.log(prisoner.bomb.length);
+          console.log(gameStatus);
+
+          if (gameStatus === 0 && prisoner.bomb.length === 0) {
+            if (level > 1) {
+              level -= 1;
+            }
+            levelLabel.text = "Try Again"
+            gameStatus = -1;
+            lives -= 1;
+          }
+
+          if (lives === 3) {
+            this.frame = 0;
+          } else if (lives === 2) {
+            this.frame = 1;
+          } else if (lives === 1) {
+            this.frame = 2;
+          } else if (lives === 0) {
+            gameStatus = -2;
+            levelLabel.text = "Game Over!";
+            game.rootScene.addChild(levelLabel);
+            game.stop();
           }
         });
 

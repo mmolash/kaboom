@@ -29,6 +29,10 @@ var createBomb = function(x, y, game, level, basket) {
   that.sprite.addEventListener(Event.ENTER_FRAME, function() {
     this.move(level);
     this.checkExplosion();
+
+    if (gameStatus === 0) {
+      game.rootScene.removeChild(this);
+    }
   });
 
   return that;
