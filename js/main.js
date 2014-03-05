@@ -45,11 +45,12 @@ window.onload = function() {
         scoreboard.x = 5;
         scoreboard.y = 5;
 
-        var basket = new Sprite(63, 89);
+        var basket = new Sprite(63, 88);
         basket.image = game.assets['assets/basket.png'];
         basket.x = WINDOW_WIDTH/2-31;
-        basket.y = WINDOW_HEIGHT-89-20;
+        basket.y = WINDOW_HEIGHT-88-20;
         basket.frame = 0;
+        basket.bombs_collected = 0;
 
         var prisoner = new Sprite(32, 66);
         prisoner.direction = 0;
@@ -116,7 +117,6 @@ window.onload = function() {
           this.num_bombs = 0;
           gameStatus = 1;
           level += 1;
-          levelLabel.text = "New Level"
           game.rootScene.addChild(levelLabel);
         }
 
@@ -132,8 +132,10 @@ window.onload = function() {
             this.num_bombs += 1;
           }
 
-          if (this.num_bombs >= level * 10 && this.bomb.length === 0) {
+          if (basket.bombs_collected >= level * 10 && this.bomb.length === 0 && gameStatus === 2) {
+            basket.bombs_collected = 0;
             gameStatus = -1;
+            levelLabel.text = "New Level";
           }
 
           if (gameStatus === -1) {
@@ -154,6 +156,7 @@ window.onload = function() {
             if (prisoner.bomb[i] && prisoner.bomb[i].sprite.checkCollision()) {
               g.rootScene.removeChild(prisoner.bomb[i].sprite);
               score += level;
+              this.bombs_collected += 1;
               prisoner.bomb.splice(i, 1);
             }
           }
@@ -162,10 +165,9 @@ window.onload = function() {
           console.log(gameStatus);
 
           if (gameStatus === 0 && prisoner.bomb.length === 0) {
-            if (level > 1) {
-              level -= 1;
-            }
             levelLabel.text = "Try Again"
+            this.bombs_collected = 0;
+            level -= 1;
             gameStatus = -1;
             lives -= 1;
           }

@@ -9,7 +9,7 @@ var createBomb = function(x, y, game, level, basket) {
 
   that.sprite.checkCollision = function () {
     if ((basket.x - this.x) >= -62 && (basket.x - this.x) <= 23) {
-      if ((basket.y - this.y) <= 31 && (basket.x - this.x) >= -89) {
+      if (((basket.y + 35 * basket.frame) - this.y) <= 31 && ((basket.y + 35 * basket.frame) - this.y) >= -88) {
         return true;
       }
     } else {
